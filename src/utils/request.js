@@ -8,7 +8,7 @@ axios.defaults.withCredentials = true
 // create an axios instance
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API, // api 的 base_url
-  baseURL:'http://3.34.221.255:8080/admin',
+  baseURL: 'http://3.34.221.255:8080/admin',
   timeout: 5000 // request timeout
 })
 
