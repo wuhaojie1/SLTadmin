@@ -80,7 +80,8 @@ export default {
         ]
       },
       passwordType: 'password',
-      loading: false
+      loading: false,
+      kaptcha:''
     }
   },
   watch: {
@@ -102,14 +103,20 @@ export default {
   methods: {
     getCode() {
       getKaptcha().then(response => {
-        this.codeImg = response.data.data
+        let res = JSON.parse(response.data.data)
+        this.codeImg = res.image;
+        this.kaptcha = res.kaptcha;
       })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid && !this.loading) {
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          let postData = {
+            ...this.loginForm,
+            code:this.loginForm.code+this.kaptcha
+          }
+          this.$store.dispatch('LoginByUsername', postData).then(() => {
             this.loading = false
             this.$router.push({ path: this.redirect || '/' })
           }).catch(response => {
