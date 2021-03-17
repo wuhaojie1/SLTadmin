@@ -3,11 +3,11 @@
 
     <!-- 查询和其他操作 -->
     <div class="filter-container">
+      <el-button v-permission="['POST /admin/category/create']" class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">添加</el-button>
       <el-input v-model="listQuery.username" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户名" />
       <el-input v-model="listQuery.userId" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户Id" />
       <el-input v-model="listQuery.mobile" clearable class="filter-item" style="width: 200px;" placeholder="请输入手机号" />
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>
-      <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <!-- 查询结果 -->
@@ -45,11 +45,8 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleDetail(scope.row)">详情</el-button>
-          <template v-if="scope.row.status">
-            <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
-            <el-button type="danger" size="mini" @click="handleRefuse(scope.row)">拒绝</el-button>
-          </template>
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button type="primary" size="mini" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,11 +82,31 @@
         <el-button type="primary" @click="handleUserUpdate">确定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="类目名" prop="category">
+          <el-select v-model="dataForm.category" v-loading="listCategoryLoading">
+            <el-option v-for="item in listCategory" :label="item.name" value="L1" />
+            <!--<el-option label="二级类目" value="L2" />-->
+          </el-select>
+        </el-form-item>
+        <el-form-item label="位置数量" prop="count">
+          <el-input v-model="dataForm.count" type="number" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">确定</el-button>
+        <el-button v-else type="primary" @click="updateData">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { fetchList, userDetail, updateUser } from '@/api/user'
+import { listCategory } from '@/api/category'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -97,6 +114,19 @@ export default {
   components: { Pagination },
   data() {
     return {
+      listCategory: null,
+      listCategoryLoading: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '创建'
+      },
+      dataForm: {
+        category: '',
+        count: ''
+      },
+      dialogFormVisible: false,
+
       list: null,
       total: 0,
       listLoading: true,
@@ -170,55 +200,49 @@ export default {
       this.userDetail = row
       this.userDialogVisible = true
     },
-    handleUserUpdate() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
-        })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
-        })
+    handleUserUpdate(row) {
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.dataForm.category = row
+      this.dataForm.count = row
     },
 
-    handlePass() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
+    getList() {
+      this.listCategoryLoading = true
+      listCategory()
+        .then(response => {
+          this.listCategory = response.data.data.list
+          this.listCategoryLoading = false
         })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
+        .catch(() => {
+          this.listCategory = []
+          this.listCategoryLoading = false
         })
     },
+    handleCreate() {
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
 
-    handleRefuse() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
+    handleDelete(row) {
+      this.$confirm('此操作将删除该位置, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
         })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
         })
+      })
     }
   }
 }

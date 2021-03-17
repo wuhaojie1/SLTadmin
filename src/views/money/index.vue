@@ -46,10 +46,6 @@
       <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">详情</el-button>
-          <template v-if="scope.row.status">
-            <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
-            <el-button type="danger" size="mini" @click="handleRefuse(scope.row)">拒绝</el-button>
-          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -171,40 +167,6 @@ export default {
       this.userDialogVisible = true
     },
     handleUserUpdate() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
-        })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
-        })
-    },
-
-    handlePass() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
-        })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
-        })
-    },
-
-    handleRefuse() {
       updateUser(this.userDetail)
         .then((response) => {
           this.userDialogVisible = false

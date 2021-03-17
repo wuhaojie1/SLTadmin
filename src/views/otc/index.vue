@@ -46,45 +46,11 @@
       <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">详情</el-button>
-          <template v-if="scope.row.status">
-            <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
-            <el-button type="danger" size="mini" @click="handleRefuse(scope.row)">拒绝</el-button>
-          </template>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    <!-- 用户编辑对话框 -->
-    <el-dialog :visible.sync="userDialogVisible" title="用户编辑">
-      <el-form ref="userDetail" :model="userDetail" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="userDetail.username" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="用户昵称" prop="nickname">
-          <el-input v-model="userDetail.nickname" />
-        </el-form-item>
-        <el-form-item label="用户密码" prop="mobile">
-          <el-input v-model="userDetail.password" />
-        </el-form-item>
-        <el-form-item label="用户手机" prop="mobile">
-          <el-input v-model="userDetail.mobile" />
-        </el-form-item>
-        <el-form-item label="用户性别" prop="gender">
-          <el-select v-model="userDetail.gender" placeholder="请选择"><el-option v-for="(item, index) in genderDic" :key="index" :label="item" :value="index" /></el-select>
-        </el-form-item>
-        <el-form-item label="用户等级" prop="userLevel">
-          <el-select v-model="userDetail.userLevel" placeholder="请选择"><el-option v-for="(item, index) in levelDic" :key="index" :label="item" :value="index" /></el-select>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="userDetail.status" placeholder="请选择"><el-option v-for="(item, index) in statusDic" :key="index" :label="item" :value="index" /></el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="userDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleUserUpdate">确定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -171,40 +137,6 @@ export default {
       this.userDialogVisible = true
     },
     handleUserUpdate() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
-        })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
-        })
-    },
-
-    handlePass() {
-      updateUser(this.userDetail)
-        .then((response) => {
-          this.userDialogVisible = false
-          this.$notify.success({
-            title: '成功',
-            message: '更新用户成功'
-          })
-        })
-        .catch(response => {
-          this.$notify.error({
-            title: '失败',
-            message: response.data.errmsg
-          })
-        })
-    },
-
-    handleRefuse() {
       updateUser(this.userDetail)
         .then((response) => {
           this.userDialogVisible = false
