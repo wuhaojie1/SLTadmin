@@ -7,7 +7,8 @@
     </div>
 
     <!-- 查询结果 -->
-    <el-table v-loading="listLoading" :data="list" element-loading-text="正在查询中。。。" border fit highlight-current-row row-key="id">
+    <!-- row-key="id" -->
+    <el-table v-loading="listLoading" :data="list" element-loading-text="正在查询中。。。" border fit highlight-current-row >
 
       <el-table-column align="center" label="类目ID" prop="id" />
 
@@ -29,11 +30,11 @@
 
       <el-table-column align="center" min-width="100" label="简介" prop="desc" />
 
-      <el-table-column align="center" label="级别" prop="level">
+      <!-- <el-table-column align="center" label="级别" prop="level">
         <template slot-scope="scope">
           <el-tag :type="scope.row.level === 'L1' ? 'primary' : 'info' ">{{ scope.row.level === 'L1' ? '一级类目' : '二级类目' }}</el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -149,7 +150,7 @@ export default {
         id: undefined,
         name: '',
         keywords: '',
-        level: 'L2',
+        level: 'L1',
         pid: 0,
         desc: '',
         iconUrl: '',
@@ -200,7 +201,7 @@ export default {
         id: undefined,
         name: '',
         keywords: '',
-        level: 'L2',
+        level: 'L1',
         pid: 0,
         desc: '',
         iconUrl: '',

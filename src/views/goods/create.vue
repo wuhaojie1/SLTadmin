@@ -84,9 +84,16 @@
           <el-button v-else class="button-new-keyword" type="primary" @click="showInput">+ 增加</el-button>
         </el-form-item>
 
-        <el-form-item label="所属分类">
+        <!-- <el-form-item label="所属分类">
           <el-cascader :options="categoryList" expand-trigger="hover" clearable @change="handleCategoryChange" />
+        </el-form-item> -->
+        <el-form-item label="所属分类">
+          <!-- <el-cascader :options="categoryList" expand-trigger="hover" clearable @change="handleCategoryChange" /> -->
+          <el-select v-model="goods.categoryId" clearable>
+            <el-option v-for="item in categoryList" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
+        <!--  -->
 
         <el-form-item label="所属品牌商">
           <el-select v-model="goods.brandId" clearable>
@@ -402,6 +409,7 @@ export default {
   methods: {
     init: function() {
       listCatAndBrand().then(response => {
+        console.log(response.data.data.categoryList)
         this.categoryList = response.data.data.categoryList
         this.brandList = response.data.data.brandList
       })
