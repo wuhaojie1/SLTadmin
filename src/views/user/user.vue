@@ -43,10 +43,16 @@
           <el-tag>{{ statusDic[scope.row.status] }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column align="center" label="审核状态" prop="authStatus">
+        <template slot-scope="scope">
+          <el-tag>{{ applyStatus[scope.row.authStatus] }}</el-tag>
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">详情</el-button>
-          <template v-if="scope.row.status">
+          <template v-if="scope.row.authStatus==='INIT'">
             <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
             <el-button type="danger" size="mini" @click="handleRefuse(scope.row)">拒绝</el-button>
           </template>
@@ -113,6 +119,11 @@ export default {
       genderDic: ['未知', '男', '女'],
       levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
       statusDic: ['可用', '禁用', '注销'],
+      applyStatus: {
+        INIT: '待审核',
+        PASS: '审核通过',
+        REFUSE: '审核未通过'
+      },
       userDialogVisible: false,
       userDetail: {
       }
@@ -187,13 +198,14 @@ export default {
         })
     },
 
-    handlePass() {
-      updateUser(this.userDetail)
+    handlePass(item) {
+      item.authStatus = 'PASS'
+      updateUser(item)
         .then((response) => {
           this.userDialogVisible = false
           this.$notify.success({
             title: '成功',
-            message: '更新用户成功'
+            message: '审核通过'
           })
         })
         .catch(response => {
@@ -204,8 +216,9 @@ export default {
         })
     },
 
-    handleRefuse() {
-      updateUser(this.userDetail)
+    handleRefuse(item) {
+      item.authStatus = 'REFUSE'
+      updateUser(item)
         .then((response) => {
           this.userDialogVisible = false
           this.$notify.success({

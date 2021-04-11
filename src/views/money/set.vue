@@ -3,15 +3,15 @@
     <el-card class="box-card">
       <h3>手续费设置</h3>
       <div class="formBox">
-        <el-form ref="form" :model="form" label-width="120px" style="width:600px;">
-          <el-form-item label="slt提现手续费">
-            <el-input v-model="form.slt" type="text" />
+        <el-form ref="form" :model="form" label-width="120px" style="width:600px;" :rules="rules">
+          <el-form-item label="提现费率" prop="drawRate">
+            <el-input v-model="form.drawRate" type="text" />
           </el-form-item>
-          <el-form-item label="eth提现手续费">
-            <el-input v-model="form.eth" type="text" />
+          <el-form-item label="otc卖手续费" prop="otcSellRate">
+            <el-input v-model="form.otcSellRate" type="text" />
           </el-form-item>
-          <el-form-item label="otc交易手续费">
-            <el-input v-model="form.otc" type="text" />
+          <el-form-item label="otc购买手续费" prop="otcBugRate">
+            <el-input v-model="form.otcBugRate" type="text" />
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -23,16 +23,25 @@
 </template>
 
 <script>
-import { messageDetail, updateMessage } from '@/api/message'
+import { detail, edit } from '@/api/configCharge'
 export default {
   name: 'Set',
   components: { },
   data() {
     return {
       form: {
-        slt: '',
-        eth: '',
-        otc: ''
+        drawRate: '',
+        otcSellRate: '',
+        otcBugRate: ''
+      }
+    }
+  },
+  computed: {
+    rules() {
+      return {
+        drawRate: [{ required: true, message: '提现费率不能为空', trigger: 'blur' }],
+        otcSellRate: [{ required: true, message: 'otc卖手续费不能为空', trigger: 'blur' }],
+        otcBugRate: [{ required: true, message: 'otc购买手续费不能为空', trigger: 'blur' }]
       }
     }
   },
@@ -41,9 +50,9 @@ export default {
   },
   methods: {
     getDetail() {
-      messageDetail(this.listQuery.userId).then(response => {
+      detail().then(response => {
         if (response.data.data) {
-          this.from = response.data.data
+          this.form = response.data.data
         } else {
         }
       }).catch(() => {
@@ -51,20 +60,27 @@ export default {
       })
     },
     handleSave() {
-      updateMessage(this.from).then(response => {
-        if (response.data.data) {
-          this.from = response.data.data
-          this.$notify.success({
-            title: '成功',
-            message: '内容配置成功'
+      this.$refs.form.validate((success) => {
+        if (success) {
+          edit(this.form).then(response => {
+            if (response.data.errno === 0) {
+              this.$notify.success({
+                title: '成功',
+                message: '手续费更新成功'
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: response.data.errmsg
+              })
+            }
+          }).catch(() => {
+            this.$notify.error({
+              title: '失败',
+              message: response.data.errmsg
+            })
           })
-        } else {
         }
-      }).catch(() => {
-        this.$notify.error({
-          title: '失败',
-          message: response.data.errmsg
-        })
       })
     }
   }

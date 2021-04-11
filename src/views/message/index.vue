@@ -2,19 +2,19 @@
   <div class="app-container">
 
     <el-card class="box-card">
-      <h3>短信配置</h3>
+      <h3>内容配置</h3>
       <div class="formBox">
-        <el-form ref="form" :model="form" label-width="120px">
-          <el-form-item label="配置内容">
+        <el-form ref="form" :model="form" label-width="120px" :rules="rules">
+          <el-form-item label="配置内容" prop="content">
             <el-input
-              v-model="form.expres"
+              v-model="form.content"
               type="textarea"
               :rows="5"
               style="width: 600px"
             />
           </el-form-item>
           <el-form-item label="是否开启">
-            <el-switch v-model="form.delivery" />
+            <el-switch v-model="form.showFlag" />
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -34,8 +34,16 @@ export default {
   data() {
     return {
       form: {
-        expres: '',
-        delivery: false
+        content: '',
+        showFlag: false
+      }
+    }
+  },
+  computed: {
+    rules() {
+      return {
+        content: [{ required: true, message: '配置内容不能为空', trigger: 'blur' }]
+
       }
     }
   },
@@ -44,9 +52,9 @@ export default {
   },
   methods: {
     getDetail() {
-      messageDetail(this.listQuery.userId).then(response => {
+      messageDetail().then(response => {
         if (response.data.data) {
-          this.from = response.data.data
+          this.form = response.data.data
         } else {
         }
       }).catch(() => {
@@ -54,19 +62,24 @@ export default {
       })
     },
     handleSave() {
-      updateMessage(this.from).then(response => {
-        if (response.data.data) {
-          this.from = response.data.data
+      updateMessage(this.form).then(response => {
+        console.log(response)
+        if (response.data.errorCode === 0) {
           this.$notify.success({
             title: '成功',
             message: '内容配置成功'
           })
         } else {
+          this.$notify.error({
+            title: '失败',
+            message: response.data.errmsg
+          })
         }
-      }).catch(() => {
+      }).catch((error) => {
+        this.getDetail()
         this.$notify.error({
           title: '失败',
-          message: response.data.errmsg
+          message: error.data.errorStr
         })
       })
     }

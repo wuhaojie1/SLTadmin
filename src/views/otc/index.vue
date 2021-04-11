@@ -3,45 +3,33 @@
 
     <!-- 查询和其他操作 -->
     <div class="filter-container">
-      <el-input v-model="listQuery.username" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户名" />
-      <el-input v-model="listQuery.userId" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户Id" />
-      <el-input v-model="listQuery.mobile" clearable class="filter-item" style="width: 200px;" placeholder="请输入手机号" />
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>
-      <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <!--<el-input v-model="listQuery.username" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户名" />-->
+      <!--<el-input v-model="listQuery.userId" clearable class="filter-item" style="width: 200px;" placeholder="请输入用户Id" />-->
+      <!--<el-input v-model="listQuery.mobile" clearable class="filter-item" style="width: 200px;" placeholder="请输入手机号" />-->
+      <!--<el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>-->
     </div>
 
     <!-- 查询结果 -->
     <el-table v-loading="listLoading" :data="list" element-loading-text="正在查询中。。。" border fit highlight-current-row>
-      <el-table-column align="center" width="100px" label="用户ID" prop="id" sortable />
+      <el-table-column align="center" width="100px" label="ID" prop="id" sortable />
 
-      <el-table-column align="center" label="用户昵称" prop="nickname" />
-
-      <el-table-column align="center" label="用户头像" width="80">
-        <template slot-scope="scope">
-          <el-avatar :src="scope.row.avatar" />
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="手机号码" prop="mobile" />
-
-      <el-table-column align="center" label="性别" prop="gender">
-        <template slot-scope="scope">
-          <el-tag>{{ genderDic[scope.row.gender] }}</el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="生日" prop="birthday" />
-
-      <el-table-column align="center" label="用户等级" prop="userLevel">
-        <template slot-scope="scope">
-          <el-tag>{{ levelDic[scope.row.userLevel] }}</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="用户昵称" prop="userName" />
+      <el-table-column align="center" label="SLT币种总数量" prop="oriAmount" />
+      <el-table-column align="center" label="SLT币种可用数量" prop="balAmount" />
+      <el-table-column align="center" label="SLT币种交易最大可用数量" prop="maxAmount" />
+      <el-table-column align="center" label="SLT币种交易最小可用数量" prop="minAmount" />
+      <el-table-column align="center" label="兑换币种ETH比率" prop="convertRate" />
+      <el-table-column align="center" label="兑换币种ETH" prop="convertSymbol" />
+      <el-table-column align="center" label="手机号码" prop="createTime" />
+      <el-table-column align="center" label="手续费" prop="feeAmount" />
+      <el-table-column align="center" label="币种" prop="symbol" />
+      <el-table-column align="center" label="交易成功时间" prop="transSuccessTime" />
+      <el-table-column align="center" label="交易类型" prop="transType" />
 
       <el-table-column align="center" label="状态" prop="status">
-        <template slot-scope="scope">
-          <el-tag>{{ statusDic[scope.row.status] }}</el-tag>
-        </template>
+        <!--<template slot-scope="scope">-->
+        <!--<el-tag>{{ statusDic[scope.row.status] }}</el-tag>-->
+        <!--</template>-->
       </el-table-column>
       <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -55,7 +43,7 @@
 </template>
 
 <script>
-import { fetchList, userDetail, updateUser } from '@/api/user'
+import { list } from '@/api/otc'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -76,9 +64,6 @@ export default {
         order: 'desc'
       },
       downloadLoading: false,
-      genderDic: ['未知', '男', '女'],
-      levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
-      statusDic: ['可用', '禁用', '注销'],
       userDialogVisible: false,
       userDetail: {
       }
@@ -89,49 +74,21 @@ export default {
   },
   methods: {
     getList() {
-      this.listLoading = true
-      if (this.listQuery.userId) {
-        userDetail(this.listQuery.userId).then(response => {
-          this.list = []
-          if (response.data.data) {
-            this.list.push(response.data.data)
-            this.total = 1
-            this.listLoading = false
-          } else {
-            this.list = []
-            this.total = 0
-            this.listLoading = false
-          }
-        }).catch(() => {
-          this.list = []
-          this.total = 0
-          this.listLoading = false
-        })
-      } else {
-        fetchList(this.listQuery).then(response => {
-          this.list = response.data.data.list
-          this.total = response.data.data.total
-          this.listLoading = false
-        }).catch(() => {
-          this.list = []
-          this.total = 0
-          this.listLoading = false
-        })
-      }
+      list(this.listQuery).then((response) => {
+        this.list = response.data.results.items
+        this.total = response.data.data.total
+        this.listLoading = false
+      }).catch(() => {
+        this.list = []
+        this.total = 0
+        this.listLoading = false
+      })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
     },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['用户名', '手机号码', '性别', '生日', '状态']
-        const filterVal = ['username', 'mobile', 'gender', 'birthday', 'status']
-        excel.export_json_to_excel2(tHeader, this.list, filterVal, '用户信息')
-        this.downloadLoading = false
-      })
-    },
+
     handleDetail(row) {
       this.userDetail = row
       this.userDialogVisible = true

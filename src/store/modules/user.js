@@ -9,7 +9,8 @@ const user = {
     name: '',
     avatar: '',
     roles: [],
-    perms: []
+    perms: [],
+    userId: ''
   },
 
   mutations: {
@@ -27,6 +28,9 @@ const user = {
     },
     SET_PERMS: (state, perms) => {
       state.perms = perms
+    },
+    SET_USERID: (state, perms) => {
+      state.userId = perms
     }
   },
 
@@ -61,6 +65,7 @@ const user = {
           commit('SET_ROLES', data.roles)
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
+          commit(' SET_USERID', data.id)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -75,6 +80,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMS', [])
+          commit(' SET_USERID', '')
           removeToken()
           resetRouter()
 

@@ -619,12 +619,32 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'earning',
+        component: () => import('@/views/money/earning'),
+        name: 'earning',
+        meta: {
+          perms: [],
+          title: '收益统计',
+          noCache: true
+        }
+      },
+      {
         path: 'list',
         component: () => import('@/views/money/index'),
         name: 'list',
         meta: {
           perms: ['GET /admin/user/list'],
-          title: '交易列表',
+          title: '充值列表',
+          noCache: true
+        }
+      },
+      {
+        path: 'reflect',
+        component: () => import('@/views/money/reflect'),
+        name: 'reflect',
+        meta: {
+          perms: [],
+          title: '提现列表',
           noCache: true
         }
       },
